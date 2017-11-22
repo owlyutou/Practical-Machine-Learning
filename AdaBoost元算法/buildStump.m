@@ -5,24 +5,25 @@ labelMat = classLabels';
 [m, n] = size(dataMat);
 numSteps = 10; 
 bestStump = containers.Map;
+bestClassEst = zeros(m, 1);
 minError = inf;
+
 for i = 1:n
     rangeMin = min(dataMat(:, i));
     rangeMax = max(dataMat(:, i));
     stepSize = (rangeMax - rangeMin) / numSteps;
     stepNum = -1:numSteps;
     foot = size(stepNum, 2);
-    for j = 1:foot
+    for j = -1:numSteps
         inequal = [0, 1];
-        for k = 1: size(inequal, 2)
-            threshVal = (rangeMin + j * stepSize);
+        for k = 1: 2     % ±éÀúinequal
+            threshVal = rangeMin + j * stepSize;
             direction = inequal(k);
             predictedVals = stumpClassify(dataMat, i, threshVal, direction);
             errArr = ones(m ,1);
             errArr(predictedVals == labelMat) = 0;
             weightedError = D' * errArr;
-            fprintf('split: dim %d, thresh %.2f, thresh inequal: %s, the weighted error is %.3f\n', ...
-                i, threshVal, num2str(direction), weightedError);
+            % fprintf('split: dim %d, thresh %f, thresh inequal: %d, the weighted error is %f\n', i, threshVal, direction, weightedError);
             if weightedError < minError
                 minError = weightedError;
                 bestClassEst = predictedVals;
